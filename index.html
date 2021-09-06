@@ -13,8 +13,8 @@
 	var i = 0;
 	for (var obj of mapping) {
 		i += 1;
-		if (i > 100) {
-			break;
+		if (!/rune/.test(obj.name)) {
+			continue;
 		}
 		if (data[obj.id]) {
 			var element = document.createElement('div');
@@ -24,16 +24,36 @@
 			var plot = data[obj.id];
 			var times = Object.keys(plot);
 			times.sort((a, b) => a - b);
-			var d = times.map(t => [
-				new Date(t * 1000), 
-				plot[t].low || null, 
-				plot[t].high || null]);
+			let prev_low = null;
+			let prev_high = null;
+			var d = times.map(t => { 
+				let low = plot[t].low || prev_low;
+				let high = plot[t].high || prev_high;
+				prev_low = low;
+				prev_high = high;
+				if (!(prev_low && prev_high)) {
+					return null;	
+				}
+
+				return [ new Date(t * 1000), high - low, low ]
+				}
+			).filter(a => a);
 			// console.log(d);
 			window.graph = new Dygraph(element, d, {
-				labels: ["x", "low","high"],
-				connectSeparatedPoints: true,
-				rollPeriod: 20,
-				showRoller: true,
+				labels: ["x", "high","low"],
+				stackedGraph:true,
+				stepPlot: true,
+				    showRangeSelector: true,
+				    rangeSelectorHeight: 20,
+				    rangeSelectorPlotStrokeColor: 'lightgrey',
+				    rangeSelectorPlotFillColor: 'lightgrey',
+         				rangeSelectorPlotFillGradientColor : 'lightgrey',
+
+				//connectSeparatedPoints: true,
+				//rollPeriod: 20,
+				//showRoller: true,
+				//drawPoint: true,
+				//pointSize:5,
 			});
 		}
 	}
