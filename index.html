@@ -26,11 +26,15 @@
 			times.sort((a, b) => a - b);
 			let prev_low = null;
 			let prev_high = null;
+			let min = Infinity;
+			let max = -Infinity;
 			var d = times.map(t => { 
 				let low = plot[t].low || prev_low;
 				let high = plot[t].high || prev_high;
 				prev_low = low;
 				prev_high = high;
+				min = Math.min(plot[t].low || Infinity, min);
+				max = Math.max(plot[t].high || -Infinity, max);
 				if (!(prev_low && prev_high)) {
 					return null;	
 				}
@@ -38,16 +42,20 @@
 				return [ new Date(t * 1000), high - low, low ]
 				}
 			).filter(a => a);
-			// console.log(d);
+			console.log({min,max});
+			let delta = max - min;
+			min = Math.max(min - delta, 0);
+			max = max + delta;
 			window.graph = new Dygraph(element, d, {
-				labels: ["x", "high","low"],
+				labels: ["x", "spread","low"],
 				stackedGraph:true,
+				valueRange : [min, max],
 				stepPlot: true,
-				    showRangeSelector: true,
-				    rangeSelectorHeight: 20,
-				    rangeSelectorPlotStrokeColor: 'lightgrey',
-				    rangeSelectorPlotFillColor: 'lightgrey',
-         				rangeSelectorPlotFillGradientColor : 'lightgrey',
+			    showRangeSelector: true,
+			    rangeSelectorHeight: 20,
+			    rangeSelectorPlotStrokeColor: 'lightgrey',
+			    rangeSelectorPlotFillColor: 'lightgrey',
+				rangeSelectorPlotFillGradientColor : 'lightgrey',
 
 				//connectSeparatedPoints: true,
 				//rollPeriod: 20,
