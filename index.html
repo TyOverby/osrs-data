@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<head>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+	<script src="./data.js"></script>
+	<script src="./mapping.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+</head>
+<body>
+	<div id="out"></div>
+
+<script>
+	var i = 0;
+	for (var obj of mapping) {
+		i += 1;
+		if (i > 100) {
+			break;
+		}
+		if (data[obj.id]) {
+			var element = document.createElement('div');
+			var text = document.createTextNode(obj.id + ' ' + obj.name);
+			document.body.append(text);
+			document.body.append(element);
+			var plot = data[obj.id];
+			var times = Object.keys(plot);
+			times.sort((a, b) => a - b);
+			var d = times.map(t => [
+				new Date(t * 1000), 
+				plot[t].low || null, 
+				plot[t].high || null]);
+			// console.log(d);
+			window.graph = new Dygraph(element, d, {
+				labels: ["x", "low","high"],
+				connectSeparatedPoints: true,
+				rollPeriod: 20,
+				showRoller: true,
+			});
+		}
+	}
+
+</script
+</body>
